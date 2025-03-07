@@ -3,8 +3,9 @@ const router = express.Router();
 const secret = require("../config");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
-const User = require("../db");
-const bcrypt = require("bcrypt");
+const { User, Account } = require("../db");
+const bcrypt = require("bcryptjs");
+const { verifyJwtToken } = require("../middleware");
 
 const signUpSchema = zod.object({
     firstName: zod.string(),
@@ -31,7 +32,7 @@ router.post("/signup", async (req, res) => {
 
     try {
         if (await isExist(userName)) {
-            return res.status(411).json({ message: "User already exists" });
+            return res.status(409).json({ message: "User already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,6 +44,12 @@ router.post("/signup", async (req, res) => {
             password: hashedPassword,
         });
         await newUser.save();
+
+        const newUserAcc = new Account({
+            userId: newUser._id,
+            balance: 5000
+        })
+        await newUserAcc.save();
 
         const token = jwt.sign({ userName }, secret, { expiresIn: "2h" });
         return res.status(201).json({
@@ -66,7 +73,7 @@ const signInSchema = zod.object({
 router.post("/signin", async (req, res) => {
     const validation = signInSchema.safeParse(req.body);
     if (!validation.success) {
-        return res.status(403).json({
+        return res.status(400).json({
             message: "Invalid Input",
             error: validation.error.errors
         });
@@ -77,12 +84,12 @@ router.post("/signin", async (req, res) => {
     try {
         const existingUser = await isExist(userName);
         if (!existingUser) {
-            return res.status(403).json({ message: "Invalid username or password" });
+            return res.status(400).json({ message: "Invalid username or password" });
         }
 
         const isPasswordValid = await bcrypt.compare(password, existingUser.password);
         if (!isPasswordValid) {
-            return res.status(403).json({ message: "Invalid username or password" });
+            return res.status(400).json({ message: "Invalid username or password" });
         }
 
         const token = jwt.sign({ userName }, secret, { expiresIn: "2h" });
@@ -108,7 +115,7 @@ const updateSchema = zod.object({
 router.put("/", verifyJwtToken, async (req,res) => {
     const validation = updateSchema.safeParse(req.body);
     if(!validation.success){
-        return res.status(403).json({
+        return res.status(400).json({
             message: "Invalid inputs",
             error: validation.error.errors,
         });
@@ -120,7 +127,7 @@ router.put("/", verifyJwtToken, async (req,res) => {
         })
         return res.status(200).json({message: "Updation Successfull"});
     } catch(error) {
-        return res.status(403).json({
+        return res.status(500).json({
             message: "Server error",
             error: error.message,
         });
