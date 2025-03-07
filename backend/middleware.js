@@ -1,4 +1,4 @@
-const secret = require("../config");
+const secret = require("./config");
 const jwt = require("jsonwebtoken");
 
 const verifyJwtToken = (req,res,next) => {
