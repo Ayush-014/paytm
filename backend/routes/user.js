@@ -54,7 +54,7 @@ router.post("/signup", async (req, res) => {
         const token = jwt.sign({ userName }, secret, { expiresIn: "2h" });
         return res.status(201).json({
             userId: newUser._id,
-            token
+            token: token
         });
     } catch (error) {
         return res.status(500).json({
@@ -95,7 +95,7 @@ router.post("/signin", async (req, res) => {
         const token = jwt.sign({ userName }, secret, { expiresIn: "2h" });
         return res.status(200).json({
             userId: existingUser._id,
-            token
+            token: token
         });
     } catch (error) {
         return res.status(500).json({
