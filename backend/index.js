@@ -5,11 +5,12 @@ const accountRouter = require("./routes/account");
 const app = express();
 const cors = require("cors");
 
-app.use(cors({
-    origin: "http://localhost:5173", // Allow only this frontend URL
-    methods: "GET,POST,PUT,DELETE", // Allow specific HTTP methods
-    credentials: true // Allow cookies and authentication headers
-}));
+// app.use(cors({
+//     origin: "http://localhost:5173", // Allow only this frontend URL
+//     methods: "GET,POST,PUT,DELETE", // Allow specific HTTP methods
+//     credentials: true // Allow cookies and authentication headers
+// }));
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/v1', mainRouter);
