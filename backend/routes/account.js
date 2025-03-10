@@ -3,10 +3,10 @@ const { Account } = require("../db");
 const router = express.Router();
 const { verifyJwtToken } = require("../middleware");
 
-router.get("/balance", verifyJwtToken, async (req, res) => {
+router.get("/balance", async (req, res) => {
     try {
         const account = await Account.findOne({
-            userId: req.body.userId
+            userId: req.query.userId
         });
 
         if (!account) {

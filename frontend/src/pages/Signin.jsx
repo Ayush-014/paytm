@@ -12,17 +12,16 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userToken = localStorage.getItem("token");
+  // useEffect(() => {
+  //   const userToken = localStorage.getItem("token");
 
-    // Check if token exists in local storage
-    if (userToken) {
-      navigate("/dashboard"); // Redirect to sign-in page if token doesn't exist
-    }
-  }, []);
+  //   if (userToken) {
+  //     navigate("/dashboard");
+  //   }
+  // }, []);
 
   return (
-    <div className="bg-slate-300 h-screen flex justify-center">
+    <div className="bg-slate-300 h-screen w-screen flex justify-center">
       <div className="flex flex-col justify-center">
         <div className="rounded-lg bg-white w-80 text-center p-2 h-max px-4">
           <Heading label={"Sign in"} />
@@ -44,14 +43,17 @@ export default function Signin() {
           <div className="pt-4">
             <Button
               onClick={async () => {
-                const response = await axios.post(
-                  import.meta.env.VITE_SERVER_URL + "/api/v1/user/signin",
+                const response = await axios.post("http://localhost:3000/api/v1/users/signin",
                   {
                     username,
                     password,
                   }
                 );
+                console.log("response.data.token " + response.data.token);
+                console.log("response.data.userId " + response.data.userId);
                 localStorage.setItem("token", response.data.token);
+                localStorage.setItem("userId", response.data.userId);
+
                 navigate("/dashboard");
               }}
               label={"Sign in"}
